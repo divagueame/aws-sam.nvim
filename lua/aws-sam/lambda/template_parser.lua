@@ -53,7 +53,6 @@ local function find_unique_function_name(content, code_uri)
 			local capture_name = query_obj.captures[id] -- Name of the capture (@key, @value)
 			local node_text = vim.treesitter.get_node_text(node, content)
 			if capture_name == "target_function_name" then
-				print(capture_name .. ": " .. node_text)
 				return node_text
 			end
 		end
