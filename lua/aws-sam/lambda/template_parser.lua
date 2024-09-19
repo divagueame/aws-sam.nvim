@@ -65,6 +65,7 @@ function M.get_function_identifier(code_uri, template_path)
 		return find_unique_function_name(content, code_uri)
 	else
 		print("Error:", err)
+		return err
 	end
 end
 

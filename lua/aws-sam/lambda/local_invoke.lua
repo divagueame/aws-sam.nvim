@@ -1,17 +1,17 @@
 local M = {}
 
-local function find_template(dir)
-  dir = vim.fn.getcwd()
-  local templates = {}
-  for _, file in ipairs(vim.fn.globpath(dir, "**/*.{yaml}", 0, 1)) do
-    table.insert(templates, file)
-  end
+local function find_template_path()
+	local dir = vim.fn.getcwd()
+	local templates = {}
+	for _, file in ipairs(vim.fn.globpath(dir, "**/*.{yaml}", 0, 1)) do
+		table.insert(templates, file)
+	end
 
-  for _, template in ipairs(templates) do
-    return template
-  end
+	for _, template in ipairs(templates) do
+		return template
+	end
 
-  return nil
+	return nil
 end
 
 local function get_code_uri()
@@ -23,40 +23,51 @@ local function get_code_uri()
 end
 
 M.invoke = function(opts)
-  local response = { exit_code = nil, stdout = nil, stderr = nil }
-  local notify = require("notify")
+	local response = { exit_code = nil, stdout = nil, stderr = nil }
+	local notify = require("notify")
 
-  vim.api.nvim_create_user_command(
-    "SamLocalInvoke",
-    vim.schedule_wrap(function()
-      local spinner = require("aws-sam.utils.spinner")
-      local code_uri = get_code_uri()
-      local template_parser = require("aws-sam.lambda.template_parser")
-      local template_path = find_template(project_path)
-      local function_logical_id = template_parser.get_function_identifier(code_uri, template_path)
-      notify(function_logical_id .. "invoked locally")
-      spinner.start()
-        vim.system({ "sam", "local", "invoke",  function_logical_id}, {}, function(obj)
-        spinner.stop()
+	vim.api.nvim_create_user_command(
+		"SamLocalInvoke",
+		vim.schedule_wrap(function()
+			local spinner = require("aws-sam.utils.spinner")
+			spinner.start()
+			local function_logical_id
+			local success, result = pcall(function()
+				local code_uri = get_code_uri()
+				local template_parser = require("aws-sam.lambda.template_parser")
+				local template_path = find_template_path()
+				function_logical_id = template_parser.get_function_identifier(code_uri, template_path)
+			end)
 
+			if not success then
+				notify(result .. "invoked locally", "error")
 
-        local stderr = obj.stderr
-        response.exit_code = obj.code
-        response.stdout = obj.stdout
-        response.stderr = obj.stderr
-        if response.exit_code == 0 then
-          notify(response.stdout)
-        else
-          notify(response.stderr)
-        end
-      end)
-    end),
-      {}
-  )
+				spinner.stop()
+				return
+			end
 
-  if opts.keymaps ~= false then
-    vim.api.nvim_set_keymap("n", "<leader><leader>i", ":SamLocalInvoke<cr>", { noremap = true, silent = true })
-  end
+			notify(function_logical_id)
+
+			vim.system({ "sam", "local", "invoke", function_logical_id }, {}, function(obj)
+				spinner.stop()
+
+				local stderr = obj.stderr
+				response.exit_code = obj.code
+				response.stdout = obj.stdout
+				response.stderr = obj.stderr
+				if response.exit_code == 0 then
+					notify(response.stdout)
+				else
+					notify(response.stderr)
+				end
+			end)
+		end),
+		{}
+	)
+
+	if opts.keymaps ~= false then
+		vim.api.nvim_set_keymap("n", "<leader><leader>i", ":SamLocalInvoke<cr>", { noremap = true, silent = true })
+	end
 end
 
 return M
