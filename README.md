@@ -29,12 +29,19 @@ return {
 ```
 :SamValidate
 ```
+
+- To invoke a lambda function locally, open your your function on a buffer and run:
+
+```
+:SamLocalInvoke<CR>
+```
+
 ## keymaps
 
-| Mode   | Keybinding          | Action             | Description                  |
-| ------ | ------------------- | ------------------ | ---------------------------- |
-| Normal | `<leader><leader>v` | `:SamValidate<CR>` | Validate an AWS SAM template |
-
+| Mode   | Keybinding          | Action                | Description                  |
+| ------ | ------------------- | --------------------- | ---------------------------- |
+| Normal | `<leader><leader>v` | `:SamValidate<CR>`    | Validate an AWS SAM template |
+| Normal | `<leader><leader>i` | `:SamLocalInvoke<CR>` | Invoke a function locally    |
 
 ## Configuration
 
@@ -47,5 +54,3 @@ require("aws-sam").setup({
     keymaps = true,
 })
 ```
-
-
