@@ -6,6 +6,8 @@ M.setup = function(user_opts)
 
   require("aws-sam.validate_template").validate_template(config.options)
   require("aws-sam.lambda.local_invoke").invoke(config.options)
+  require("aws-sam.keymaps").setup(config.options)
+
 end
 
 return M

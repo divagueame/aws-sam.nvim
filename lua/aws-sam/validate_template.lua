@@ -25,10 +25,6 @@ M.validate_template = function(opts)
     end),
     {}
   )
-
-  if opts.keymaps ~= false then
-    vim.api.nvim_set_keymap("n", "<leader><leader>v", ":SamValidate<cr>", {})
-  end
 end
 
 return M
