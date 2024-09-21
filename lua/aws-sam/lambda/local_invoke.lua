@@ -39,19 +39,17 @@ M.invoke = function(opts)
 				function_logical_id = template_parser.get_function_identifier(code_uri, template_path)
 			end)
 
-			if not success then
-				notify(result .. "invoked locally", "error")
-
+			if not success or function_logical_id == nil then
+				notify("Could not find the Function's logical name", "error")
 				spinner.stop()
 				return
 			end
 
-			notify(function_logical_id)
+      notify('Invoking locally - ' .. function_logical_id)
 
 			vim.system({ "sam", "local", "invoke", function_logical_id }, {}, function(obj)
 				spinner.stop()
 
-				local stderr = obj.stderr
 				response.exit_code = obj.code
 				response.stdout = obj.stdout
 				response.stderr = obj.stderr
