@@ -1,13 +1,5 @@
 local M = {}
 
-local function get_code_uri()
-  local buf = vim.api.nvim_get_current_buf()
-  local buf_path = vim.api.nvim_buf_get_name(buf)
-  local dir = vim.fn.fnamemodify(buf_path, ":p:h")
-  local parent_folder = vim.fn.fnamemodify(dir, ":t")
-  return parent_folder .. "/"
-end
-
 M.invoke_fn = function()
   local response = { exit_code = nil, stdout = nil, stderr = nil }
   local notify = require("notify")
@@ -18,7 +10,7 @@ M.invoke_fn = function()
   spinner.start()
   local function_logical_id
   local success, _ = pcall(function()
-    local code_uri = get_code_uri()
+    local code_uri = finders.get_code_uri()
     local template_parser = require("aws-sam.lambda.template_parser")
     local template_path = finders.find_template_path()
     function_logical_id = template_parser.get_function_identifier(code_uri, template_path)
