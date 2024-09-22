@@ -18,10 +18,12 @@ end
 
 function M.get_code_uri()
   local buf = vim.api.nvim_get_current_buf()
-  local buf_path = vim.api.nvim_buf_get_name(buf)
-  local dir = vim.fn.fnamemodify(buf_path, ":p:h")
-  local parent_folder = vim.fn.fnamemodify(dir, ":t")
-  return parent_folder .. "/"
+  local buf_folder_path = vim.api.nvim_buf_get_name(buf)
+
+  local project_path = vim.fn.getcwd()
+  local dir = vim.fn.fnamemodify(buf_folder_path, ":p:h")
+
+  return dir:sub(#project_path + 2) .. "/"
 end
 
 return M
