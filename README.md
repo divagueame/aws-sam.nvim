@@ -13,9 +13,6 @@ Using Lazy:
 ```
 return {
 	"divagueame/aws-sam.nvim",
-	dependencies = {
-		"rcarriga/nvim-notify",
-	},
 	config = function()
 		require("aws-sam").setup()
 	end,
