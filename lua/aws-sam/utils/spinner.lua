@@ -1,6 +1,9 @@
 local M = {}
 
 function M.start()
+  if M.buf ~= nil then
+    return
+  end
   local buf = vim.api.nvim_create_buf(false, true)
   local opts = {
     relative = 'editor',
@@ -50,21 +53,31 @@ function M.start()
 end
 
 function M.stop()
+  M.animation_running = false
+
   if M.timer then
     M.timer:stop()
     M.timer:close()
     M.timer = nil
   end
-  M.animation_running = false
-  if M.win and M.buf then
+
+  if M.win then
     vim.schedule(function()
-      vim.api.nvim_win_close(M.win, true)
-      vim.api.nvim_buf_delete(M.buf, { force = true })
-      M.win = nil
-      M.buf = nil
+      if vim.api.nvim_win_is_valid(M.win) then
+        vim.api.nvim_win_close(M.win, true)
+        M.win = nil
+      end
+    end)
+  end
+
+  if M.buf then
+    vim.schedule(function()
+      if vim.api.nvim_buf_is_valid(M.buf) then
+        vim.api.nvim_buf_delete(M.buf, { force = true })
+        M.buf = nil
+      end
     end)
   end
 end
 
 return M
-
