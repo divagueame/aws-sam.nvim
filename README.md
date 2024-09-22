@@ -25,10 +25,11 @@ return {
 ## Usage
 
 - To validate a SAM Template, open a SAM project and type:
-
 ```
 :SamValidate
 ```
+This command will find recursively to find your template.yml in that project.
+
 
 - To invoke a lambda function locally, open your your function on a buffer and run:
 

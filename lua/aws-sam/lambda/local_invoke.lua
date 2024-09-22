@@ -1,17 +1,18 @@
 local M = {}
 
+-- TODO Support several templates
 local function find_template_path()
-	local dir = vim.fn.getcwd()
-	local templates = {}
-	for _, file in ipairs(vim.fn.globpath(dir, "**/*.{yaml}", 0, 1)) do
-		table.insert(templates, file)
-	end
+  local dir = vim.fn.getcwd()
+  local templates = {}
+  for _, file in ipairs(vim.fn.globpath(dir, "**/*.{yaml}", 0, 1)) do
+    table.insert(templates, file)
+  end
 
-	for _, template in ipairs(templates) do
-		return template
-	end
+  for _, template in ipairs(templates) do
+    return template
+  end
 
-	return nil
+  return nil
 end
 
 local function get_code_uri()
@@ -22,46 +23,53 @@ local function get_code_uri()
   return parent_folder .. "/"
 end
 
+local function invoke_fn()
+  local response = { exit_code = nil, stdout = nil, stderr = nil }
+  local notify = require("notify")
+
+
+  local spinner = require("aws-sam.utils.spinner")
+  spinner.start()
+  local function_logical_id
+  local success, result = pcall(function()
+    local code_uri = get_code_uri()
+    local template_parser = require("aws-sam.lambda.template_parser")
+    local template_path = find_template_path()
+    function_logical_id = template_parser.get_function_identifier(code_uri, template_path)
+  end)
+
+  if not success or function_logical_id == nil then
+    notify("Could not find the Function's logical name", "error")
+    spinner.stop()
+    return
+  end
+
+  notify('Invoking locally - ' .. function_logical_id)
+
+  vim.system({ "sam", "local", "invoke", function_logical_id }, {}, function(obj)
+    spinner.stop()
+
+    response.exit_code = obj.code
+    response.stdout = obj.stdout
+    response.stderr = obj.stderr
+    if response.exit_code == 0 then
+      notify(response.stdout)
+    else
+      notify(response.stderr)
+    end
+  end)
+end
+
 M.invoke = function(opts)
-	local response = { exit_code = nil, stdout = nil, stderr = nil }
-	local notify = require("notify")
-
-	vim.api.nvim_create_user_command(
-		"SamLocalInvoke",
-		vim.schedule_wrap(function()
-			local spinner = require("aws-sam.utils.spinner")
-			spinner.start()
-			local function_logical_id
-			local success, result = pcall(function()
-				local code_uri = get_code_uri()
-				local template_parser = require("aws-sam.lambda.template_parser")
-				local template_path = find_template_path()
-				function_logical_id = template_parser.get_function_identifier(code_uri, template_path)
-			end)
-
-			if not success or function_logical_id == nil then
-				notify("Could not find the Function's logical name", "error")
-				spinner.stop()
-				return
-			end
-
-      notify('Invoking locally - ' .. function_logical_id)
-
-			vim.system({ "sam", "local", "invoke", function_logical_id }, {}, function(obj)
-				spinner.stop()
-
-				response.exit_code = obj.code
-				response.stdout = obj.stdout
-				response.stderr = obj.stderr
-				if response.exit_code == 0 then
-					notify(response.stdout)
-				else
-					notify(response.stderr)
-				end
-			end)
-		end),
-		{}
-	)
+  vim.api.nvim_create_user_command(
+    "SamLocalInvoke",
+    vim.schedule_wrap(
+      function()
+        invoke_fn()
+      end
+    ),
+    {}
+  )
 
 end
 
