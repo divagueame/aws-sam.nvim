@@ -1,20 +1,5 @@
 local M = {}
 
--- TODO Support several templates
-local function find_template_path()
-  local dir = vim.fn.getcwd()
-  local templates = {}
-  for _, file in ipairs(vim.fn.globpath(dir, "**/*.{yaml}", 0, 1)) do
-    table.insert(templates, file)
-  end
-
-  for _, template in ipairs(templates) do
-    return template
-  end
-
-  return nil
-end
-
 local function get_code_uri()
   local buf = vim.api.nvim_get_current_buf()
   local buf_path = vim.api.nvim_buf_get_name(buf)
@@ -29,12 +14,13 @@ local function invoke_fn()
 
 
   local spinner = require("aws-sam.utils.spinner")
+  local finders = require("aws-sam.utils.finders")
   spinner.start()
   local function_logical_id
-  local success, result = pcall(function()
+  local success, _ = pcall(function()
     local code_uri = get_code_uri()
     local template_parser = require("aws-sam.lambda.template_parser")
-    local template_path = find_template_path()
+    local template_path = finders.find_template_path()
     function_logical_id = template_parser.get_function_identifier(code_uri, template_path)
   end)
 
@@ -60,7 +46,7 @@ local function invoke_fn()
   end)
 end
 
-M.invoke = function(opts)
+M.invoke = function()
   vim.api.nvim_create_user_command(
     "SamLocalInvoke",
     vim.schedule_wrap(
