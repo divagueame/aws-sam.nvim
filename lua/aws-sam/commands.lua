@@ -1,0 +1,19 @@
+vim.api.nvim_create_user_command(
+  "SamLocalInvoke",
+  vim.schedule_wrap(
+    function()
+      require("aws-sam.lambda.local_invoke").invoke_fn()
+    end
+  ),
+  {}
+)
+
+vim.api.nvim_create_user_command(
+  "SamValidate",
+  vim.schedule_wrap(
+    function()
+      require("aws-sam.validate_template").validate()
+    end
+  ),
+  {}
+)

@@ -8,7 +8,7 @@ local function get_code_uri()
   return parent_folder .. "/"
 end
 
-local function invoke_fn()
+M.invoke_fn = function()
   local response = { exit_code = nil, stdout = nil, stderr = nil }
   local notify = require("notify")
 
@@ -44,19 +44,6 @@ local function invoke_fn()
       notify(response.stderr)
     end
   end)
-end
-
-M.invoke = function()
-  vim.api.nvim_create_user_command(
-    "SamLocalInvoke",
-    vim.schedule_wrap(
-      function()
-        invoke_fn()
-      end
-    ),
-    {}
-  )
-
 end
 
 return M
