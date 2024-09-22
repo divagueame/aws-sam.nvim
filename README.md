@@ -43,6 +43,7 @@ This command will find recursively to find your template.yml in that project.
 | ------ | ------------------- | --------------------- | ---------------------------- |
 | Normal | `<leader><leader>v` | `:SamValidate<CR>`    | Validate an AWS SAM template |
 | Normal | `<leader><leader>i` | `:SamLocalInvoke<CR>` | Invoke a function locally    |
+| Normal | `<leader><leader>b` | `:SamLocalBuildInvokeFn<CR>` | Build && invoke a function locally    |
 
 ## Configuration
 
