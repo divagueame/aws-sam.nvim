@@ -32,8 +32,10 @@ M.invoke_fn = function()
     response.stderr = obj.stderr
     if response.exit_code == 0 then
       notify(response.stdout)
+      notify(response.stderr)
     else
       notify(response.stderr)
+      notify(response.stdout)
     end
   end)
 end
