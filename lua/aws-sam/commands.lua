@@ -37,3 +37,15 @@ vim.api.nvim_create_user_command(
   ),
   {}
 )
+
+vim.api.nvim_create_user_command(
+  "SamApiGatewayLocalStart",
+  vim.schedule_wrap(
+    function()
+      require("aws-sam.api_gateway.local_start").local_start()
+    end
+  ),
+  {}
+)
+
+

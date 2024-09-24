@@ -52,8 +52,9 @@ This command will find recursively to find your template.yml in that project.
 | Mode   | Keybinding          | Action                | Description                  |
 | ------ | ------------------- | --------------------- | ---------------------------- |
 | Normal | `<leader><leader>v` | `:SamValidate<CR>`    | Validate an AWS SAM template |
-| Normal | `<leader><leader>i` | `:SamLocalInvoke<CR>` | Invoke a function locally    |
+| Normal | N/A                 | `:SamLocalInvoke<CR>` | Invoke a function locally    |
 | Normal | `<leader><leader>f` | `:SamLocalBuildInvokeFn<CR>` | Build && Invoke a function locally    |
+| Normal | `<leader><leader>g` | `:SamApiGatewayLocalStart<CR>` | Build && serve the API Gateway locally    |
 
 ## Configuration
 
