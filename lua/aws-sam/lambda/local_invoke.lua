@@ -1,16 +1,19 @@
 local M = {}
 
 M.invoke_fn = function()
-  local response = { exit_code = nil, stdout = nil, stderr = nil }
-  local notify = require("notify")
-
-
   local spinner = require("aws-sam.utils.spinner")
-  local finders = require("aws-sam.utils.finders")
   spinner.start()
+  local lacasitos =   require("lacasitos")
+  local notify = require("notify")
+  local finders = require("aws-sam.utils.finders")
+  local lambda_event_file
+
   local function_logical_id
   local success, _ = pcall(function()
     local code_uri = finders.get_code_uri()
+    local events = finders.get_events(code_uri)
+    lambda_event_file = lacasitos.get_user_choice(events)
+
     local template_parser = require("aws-sam.lambda.template_parser")
     local template_path = finders.find_template_path()
     function_logical_id = template_parser.get_function_identifier(code_uri, template_path)
@@ -23,10 +26,17 @@ M.invoke_fn = function()
   end
 
   notify('Invoking locally - ' .. function_logical_id)
+  local command = { "sam", "local", "invoke", function_logical_id }
 
-  vim.system({ "sam", "local", "invoke", function_logical_id }, {}, function(obj)
+  if lambda_event_file then
+    table.insert(command, "--event")
+    table.insert(command, lambda_event_file)
+  end
+
+  vim.system(command, {}, function(obj)
     spinner.stop()
 
+    local response = { exit_code = nil, stdout = nil, stderr = nil }
     response.exit_code = obj.code
     response.stdout = obj.stdout
     response.stderr = obj.stderr
