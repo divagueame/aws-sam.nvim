@@ -9,18 +9,29 @@ M.invoke_fn = function()
   local lambda_event_file
 
   local function_logical_id
+  local code_uri
+
   local success, _ = pcall(function()
-    local code_uri = finders.get_code_uri()
+    code_uri = finders.get_code_uri()
     local events = finders.get_events(code_uri)
     lambda_event_file = lacasitos.get_user_choice(events)
+  end)
 
+  if not success then
+    notify("Error. No Code UIR or Events", "error" )
+    spinner.stop()
+    return
+  end
+
+
+  success, _ = pcall(function()
     local template_parser = require("aws-sam.lambda.template_parser")
     local template_path = finders.find_template_path()
     function_logical_id = template_parser.get_function_identifier(code_uri, template_path)
   end)
 
   if not success or function_logical_id == nil then
-    notify("Could not find the Function's logical name", "error")
+    notify("Could not find the Function's logical name", "error" )
     spinner.stop()
     return
   end
