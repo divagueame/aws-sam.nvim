@@ -19,7 +19,7 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command(
-  "SamLocalBuildInvokeFn",
+  "SamBuild",
   vim.schedule_wrap(
     function()
       require("aws-sam.lambda.build").build()

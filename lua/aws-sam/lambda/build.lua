@@ -2,7 +2,7 @@ local M = {}
 
 function M.build()
   local response = { exit_code = nil, stdout = nil, stderr = nil }
-  -- local notify = require("notify")
+  local notify = require("notify")
 
   local spinner = require("aws-sam.utils.spinner")
   local finders = require("aws-sam.utils.finders")
@@ -16,12 +16,12 @@ function M.build()
   end)
 
   if not success or function_logical_id == nil then
-    -- notify("Could not find the Function's logical name", "error")
+    notify("Could not find the Function's logical name", "error")
     spinner.stop()
     return
   end
 
-  -- notify('Building locally - ' .. function_logical_id)
+  notify('Building locally - ' .. function_logical_id)
 
   vim.system({ "sam", "build", function_logical_id }, {}, function(obj)
     spinner.stop()
@@ -30,9 +30,9 @@ function M.build()
     response.stdout = obj.stdout
     response.stderr = obj.stderr
     if response.exit_code == 0 then
-      -- notify(response.stdout)
+      notify(response.stdout)
     else
-      -- notify(response.stderr)
+      notify(response.stderr)
     end
   end)
 end
